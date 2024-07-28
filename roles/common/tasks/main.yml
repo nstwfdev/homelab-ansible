@@ -1,4 +1,26 @@
 ---
+- name: Gather facts
+  ansible.builtin.setup:
+    filter: ansible_os_family
+
+- name: Update package index on Alpine Linux
+  ansible.builtin.command: apk update
+  when: ansible_os_family == "Alpine"
+
+- name: Upgrade all packages on Alpine Linux
+  ansible.builtin.command: apk upgrade
+  when: ansible_os_family == "Alpine"
+
+- name: Update package index on Ubuntu
+  ansible.builtin.apt:
+    update_cache: yes
+  when: ansible_os_family == "Debian"
+
+- name: Upgrade all packages on Ubuntu
+  ansible.builtin.apt:
+    upgrade: dist
+  when: ansible_os_family == "Debian"
+
 - name: Install packages
   ansible.builtin.package:
     state: present
