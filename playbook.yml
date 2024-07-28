@@ -1,5 +1,6 @@
 ---
 - name: Homelab VM
+  hosts: all
   roles:
     - common
     - omz
