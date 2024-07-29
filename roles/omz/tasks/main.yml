@@ -40,6 +40,8 @@
       dest: ~/.p10k.zsh
     - url: https://raw.githubusercontent.com/nstwfdev/configs/main/omz/.zshrc
       dest: ~/.zshrc
+    - url: https://raw.githubusercontent.com/nstwfdev/configs/main/omz/.zsh_keybindings
+      dest: ~/.zsh_keybindings
 
 - name: Change user shell to zsh
   ansible.builtin.user:
