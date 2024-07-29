@@ -18,12 +18,12 @@
   loop:
     - repo: https://github.com/zsh-users/zsh-autosuggestions
       dest: ~/.oh-my-zsh/custom/plugins/zsh-autosuggestions
-    - repo: https://github.com/zsh-users/zsh-completions
-      dest: ~/.oh-my-zsh/custom/plugins/zsh-completions
     - repo: https://github.com/zsh-users/zsh-syntax-highlighting
       dest: ~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting
     - repo: https://github.com/TamCore/autoupdate-oh-my-zsh-plugins
       dest: ~/.oh-my-zsh/custom/plugins/autoupdate
+    - repo: https://github.com/romkatv/zsh-defer
+      dest: ~/.oh-my-zsh/custom/plugins/zsh-defer
 
 - name: Install Powerline10k theme
   ansible.builtin.git:
