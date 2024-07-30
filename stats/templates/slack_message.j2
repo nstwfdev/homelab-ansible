@@ -1,23 +1,14 @@
 {
   "blocks": [
     {
-      "type": "context",
-      "elements": [
-        {
-          "type": "mrkdwn",
-          "text": ":green_square:"
-        }
-      ]
-    },
-    {
       "type": "divider"
     },
     {
-      "type": "section",
+      "type": "header",
       "block_id": "host_info",
       "text": {
         "type": "mrkdwn",
-        "text": "*System Metrics for Host:* `{{ inventory_hostname }}`"
+        "text": "*System Metrics for Host:* ```{{ inventory_hostname }}```"
       }
     },
     {
