@@ -1,0 +1,59 @@
+---
+- name: Check system metrics and notify via Slack
+  hosts: all
+  tasks:
+    - name: Check disk usage
+      command: df -h
+      register: disk_usage
+
+    - name: Check CPU usage
+      command: "mpstat 1 1 | awk '/Average/ {print "CPU Usage: " $3 + $5}'"
+      register: cpu_usage
+
+    - name: Check memory usage
+      command: "free -m"
+      register: memory_usage
+
+    - name: Check load average
+      command: uptime
+      register: load_average
+
+    - name: Check network statistics
+      command: netstat -i
+      register: network_stats
+
+    - name: Process and format disk usage
+      set_fact:
+        formatted_disk_usage: "{{ disk_usage.stdout_lines | join('\n') }}"
+
+    - name: Process and format CPU usage
+      set_fact:
+        formatted_cpu_usage: "{{ cpu_usage.stdout | trim }}"
+
+    - name: Process and format memory usage
+      set_fact:
+        formatted_memory_usage: "{{ memory_usage.stdout_lines | join('\n') }}"
+
+    - name: Process and format load average
+      set_fact:
+        formatted_load_average: "{{ load_average.stdout | regex_replace('.*average: ', '') | trim }}"
+
+    - name: Process and format network statistics
+      set_fact:
+        formatted_network_stats: "{{ network_stats.stdout_lines | join('\n') }}"
+
+    - name: Send system metrics to Slack
+      uri:
+        url: "{{ lookup('env', 'SLACK_WEBHOOK_URL') }}"
+        method: POST
+        headers:
+          Content-Type: "application/json"
+      body: "{{ lookup('template', 'slack_message.j2') }}"
+      body_format: json
+      status_code: 200
+      when:
+        - formatted_disk_usage is defined
+        - formatted_cpu_usage is defined
+        - formatted_memory_usage is defined
+        - formatted_load_average is defined
+        - formatted_network_stats is defined
