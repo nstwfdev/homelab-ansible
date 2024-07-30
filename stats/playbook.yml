@@ -7,7 +7,8 @@
       register: disk_usage
 
     - name: Check CPU usage
-      command: "mpstat 1 1 | awk '/Average/ {print "CPU Usage: " $3 + $5}'"
+      command: >
+        mpstat 1 1 | awk '/Average/ {print "CPU Usage: " $3 + $5}'
       register: cpu_usage
 
     - name: Check memory usage
