@@ -3,7 +3,8 @@
   hosts: all
   tasks:
     - name: Check disk usage
-      command: df -h
+      command: >
+        df -h
       register: disk_usage
 
     - name: Check CPU usage
@@ -12,7 +13,8 @@
       register: cpu_usage
 
     - name: Check memory usage
-      command: "free -m"
+      command: >
+        free -m
       register: memory_usage
 
     - name: Check load average
@@ -20,8 +22,8 @@
       register: load_average
 
     - name: Check network statistics
-      command: netstat -i
-      register: network_stats
+      command: >
+        netstat -i register: network_stats
 
     - name: Process and format disk usage
       set_fact:
@@ -49,12 +51,12 @@
         method: POST
         headers:
           Content-Type: "application/json"
-      body: "{{ lookup('template', 'slack_message.j2') }}"
-      body_format: json
-      status_code: 200
-      when:
-        - formatted_disk_usage is defined
-        - formatted_cpu_usage is defined
-        - formatted_memory_usage is defined
-        - formatted_load_average is defined
-        - formatted_network_stats is defined
+        body: "{{ lookup('template', 'slack_message.j2') }}"
+        body_format: json
+        status_code: 200
+        when:
+          - formatted_disk_usage is defined
+          - formatted_cpu_usage is defined
+          - formatted_memory_usage is defined
+          - formatted_load_average is defined
+          - formatted_network_stats is defined
