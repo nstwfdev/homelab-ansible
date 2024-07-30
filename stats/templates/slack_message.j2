@@ -2,10 +2,20 @@
   "blocks": [
     {
       "type": "section",
+      "text": {
+        "type": "mrkdwn",
+        "text": "*Execution:* #{{ ansible_run_id }}"
+      }
+    },
+    {
+      "type": "divider"
+    },
+    {
+      "type": "section",
       "block_id": "host_info",
       "text": {
         "type": "mrkdwn",
-        "text": "*System Metrics for Host:* `{{ inventory_hostname }}\n\n`"
+        "text": "*System Metrics for Host:* `{{ inventory_hostname }}`"
       }
     },
     {

@@ -3,23 +3,24 @@
   hosts: all
   tasks:
     - name: Check disk usage
-      command: >
-        df -h
+      command: df -h
       register: disk_usage
 
     - name: Check CPU usage
       command: >
         mpstat 1 1 | awk '/Average/ {print "CPU Usage: " $3 + $5}'
       register: cpu_usage
+      changed_when: false
 
     - name: Check memory usage
-      command: >
-        free -m
+      command: free -m
       register: memory_usage
+      changed_when: false
 
     - name: Check load average
       command: uptime
       register: load_average
+      changed_when: false
 
     - name: Process and format disk usage
       set_fact:
