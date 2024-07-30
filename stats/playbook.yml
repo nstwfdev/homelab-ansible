@@ -21,10 +21,6 @@
       command: uptime
       register: load_average
 
-    - name: Check network statistics
-      command: >
-        netstat -i register: network_stats
-
     - name: Process and format disk usage
       set_fact:
         formatted_disk_usage: "{{ disk_usage.stdout_lines | join('\n') }}"
@@ -41,10 +37,6 @@
       set_fact:
         formatted_load_average: "{{ load_average.stdout | regex_replace('.*average: ', '') | trim }}"
 
-    - name: Process and format network statistics
-      set_fact:
-        formatted_network_stats: "{{ network_stats.stdout_lines | join('\n') }}"
-
     - name: Send system metrics to Slack
       uri:
         url: "{{ lookup('env', 'SLACK_WEBHOOK_URL') }}"
@@ -59,4 +51,3 @@
           - formatted_cpu_usage is defined
           - formatted_memory_usage is defined
           - formatted_load_average is defined
-          - formatted_network_stats is defined
