@@ -1,11 +1,13 @@
 {
   "blocks": [
     {
-      "type": "section",
-      "text": {
-        "type": "mrkdwn",
-        "text": "*Execution:* #{{ ansible_run_id }}"
-      }
+      "type": "context",
+      "elements": [
+        {
+          "type": "mrkdwn",
+          "text": ":green_square:"
+        }
+      ]
     },
     {
       "type": "divider"
