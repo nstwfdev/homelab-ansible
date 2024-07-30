@@ -46,8 +46,8 @@
         body: "{{ lookup('template', 'slack_message.j2') }}"
         body_format: json
         status_code: 200
-        when:
-          - formatted_disk_usage is defined
-          - formatted_cpu_usage is defined
-          - formatted_memory_usage is defined
-          - formatted_load_average is defined
+      when:
+        - formatted_disk_usage is defined
+        - formatted_cpu_usage is defined
+        - formatted_memory_usage is defined
+        - formatted_load_average is defined
