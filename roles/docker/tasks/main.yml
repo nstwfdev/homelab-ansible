@@ -9,34 +9,40 @@
     msg: "Docker is not installed on this host."
   when: docker_check.rc != 0
 
-- name: Create Docker configuration directory
-  file:
-    path: /etc/docker
-    state: directory
-    mode: '0755'
-  when: docker_check.rc == 0
+- block:
+    - name: Create Docker configuration directory
+      file:
+        path: /etc/docker
+        state: directory
+        mode: '0755'
 
-- name: Backup existing daemon.json if it exists
-  stat:
-    path: /etc/docker/daemon.json
-  register: ansible_stat
+    - name: Backup existing daemon.json if it exists
+      stat:
+        path: /etc/docker/daemon.json
+      register: ansible_stat
 
-- name: Backup existing daemon.json if it exists
-  copy:
-    src: /etc/docker/daemon.json
-    dest: /etc/docker/daemon.json.bak
-    remote_src: yes
-  when: docker_check.rc == 0 and ansible_stat.stat.exists
-  ignore_errors: yes
+    - name: Backup existing daemon.json if it exists
+      copy:
+        src: /etc/docker/daemon.json
+        dest: /etc/docker/daemon.json.bak
+        remote_src: yes
+      when: ansible_stat.stat.exists
+      ignore_errors: yes
 
-- name: Create/Update Docker daemon.json for TCP
-  template:
-    src: daemon.json.j2
-    dest: /etc/docker/daemon.json
-  when: docker_check.rc == 0
+    - name: Create/Update Docker daemon.json for TCP
+      template:
+        src: daemon.json.j2
+        dest: /etc/docker/daemon.json
 
-- name: Restart Docker
-  service:
-    name: docker
-    state: restarted
+    - name: Start and enable Docker service
+      service:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Restart Docker if required
+      service:
+        name: docker
+        state: restarted
+      when: restart_docker | default(false)
   when: docker_check.rc == 0
