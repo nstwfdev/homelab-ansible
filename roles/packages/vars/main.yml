@@ -1,0 +1,15 @@
+---
+common_packages:
+  - git
+  - curl
+  - unzip
+  - cfdisk
+  - e2fsprogs-extra
+  - fzf
+  - diffutils
+  - ripgrep # https://github.com/BurntSushi/ripgrep
+  - procs # https://github.com/dalance/procs
+  - dust # https://github.com/bootandy/dust
+  - exa # https://github.com/ogham/exa
+  - bat # https://github.com/sharkdp/bat
+  - zoxide # https://github.com/ajeetdsouza/zoxide

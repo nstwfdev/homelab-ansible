@@ -3,38 +3,27 @@
   ansible.builtin.setup:
     filter: ansible_os_family
 
-- name: Update package index on Alpine Linux
-  ansible.builtin.command: apk update
+- name: Update and upgrade packages on Alpine Linux
+  block:
+    - name: Update package index on Alpine Linux
+      ansible.builtin.command: apk update
+
+    - name: Upgrade all packages on Alpine Linux
+      ansible.builtin.command: apk upgrade
   when: ansible_os_family == "Alpine"
 
-- name: Upgrade all packages on Alpine Linux
-  ansible.builtin.command: apk upgrade
-  when: ansible_os_family == "Alpine"
+- name: Update and upgrade packages on Debian-based systems
+  block:
+    - name: Update package index on Debian-based systems
+      ansible.builtin.apt:
+        update_cache: yes
 
-- name: Update package index on Ubuntu
-  ansible.builtin.apt:
-    update_cache: yes
+    - name: Upgrade all packages on Debian-based systems
+      ansible.builtin.apt:
+        upgrade: dist
   when: ansible_os_family == "Debian"
 
-- name: Upgrade all packages on Ubuntu
-  ansible.builtin.apt:
-    upgrade: dist
-  when: ansible_os_family == "Debian"
-
-- name: Install packages
+- name: Install common packages
   ansible.builtin.package:
     state: present
-    name:
-      - git
-      - curl
-      - unzip
-      - cfdisk
-      - e2fsprogs-extra
-      - fzf
-      - diffutils
-      - ripgrep # https://github.com/BurntSushi/ripgrep
-      - procs # https://github.com/dalance/procs
-      - dust # https://github.com/bootandy/dust
-      - exa # https://github.com/ogham/exa
-      - bat # https://github.com/sharkdp/bat
-      - zoxide # https://github.com/ajeetdsouza/zoxide
+    name: "{{ common_packages }}"
