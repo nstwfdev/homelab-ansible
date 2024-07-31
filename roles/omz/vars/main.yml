@@ -1,0 +1,26 @@
+---
+oh_my_zsh_dir: ~/.oh-my-zsh
+oh_my_zsh_custom_dir: "{{ oh_my_zsh_dir }}/custom"
+oh_my_zsh_custom_plugins_dir: "{{ oh_my_zsh_custom_dir }}/plugins"
+oh_my_zsh_custom_themes_dir: "{{ oh_my_zsh_custom_dir }}/themes"
+
+zsh_plugins:
+  - repo: https://github.com/zsh-users/zsh-autosuggestions
+    dest: "{{ oh_my_zsh_custom_plugins_dir }}/zsh-autosuggestions"
+  - repo: https://github.com/zsh-users/zsh-syntax-highlighting
+    dest: "{{ oh_my_zsh_custom_plugins_dir }}/zsh-syntax-highlighting"
+  - repo: https://github.com/TamCore/autoupdate-oh-my-zsh-plugins
+    dest: "{{ oh_my_zsh_custom_plugins_dir }}/autoupdate"
+  - repo: https://github.com/romkatv/zsh-defer
+    dest: "{{ oh_my_zsh_custom_plugins_dir }}/zsh-defer"
+
+powerlevel10k_repo: https://github.com/romkatv/powerlevel10k.git
+powerlevel10k_dest: "{{ oh_my_zsh_custom_themes_dir }}/powerlevel10k"
+
+config_files:
+  - url: https://raw.githubusercontent.com/nstwfdev/configs/main/omz/.p10k.zsh
+    dest: ~/.p10k.zsh
+  - url: https://raw.githubusercontent.com/nstwfdev/configs/main/omz/.zshrc
+    dest: ~/.zshrc
+  - url: https://raw.githubusercontent.com/nstwfdev/configs/main/omz/.zsh_keybindings
+    dest: ~/.zsh_keybindings
