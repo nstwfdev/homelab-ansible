@@ -33,10 +33,10 @@
   template:
     src: daemon.json.j2
     dest: /etc/docker/daemon.json
-  notify: Restart Docker
   when: docker_check.rc == 0
 
 - name: Restart Docker
   service:
     name: docker
     state: restarted
+  when: docker_check.rc == 0
