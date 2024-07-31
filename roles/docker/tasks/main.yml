@@ -11,30 +11,35 @@
 
 - name: Create Docker configuration directory
   file:
-    path: /etc/docker
+    path: "{{ docker_config_dir }}"
     state: directory
     mode: '0755'
   when: docker_check.rc == 0
 
 - name: Check if daemon.json exists
   stat:
-    path: /etc/docker/daemon.json
+    path: "{{ docker_daemon_json }}"
   register: daemon_json_stat
 
 - name: Generate new daemon.json to temporary location
   template:
     src: daemon.json.j2
-    dest: /etc/docker/daemon.json.temp
+    dest: "{{ docker_daemon_json_temp }}"
 
-- name: Compare current and new daemon.json
-  command: diff /etc/docker/daemon.json /etc/docker/daemon.json.temp
-  register: daemon_json_diff
-  ignore_errors: yes
+- name: Read current daemon.json
+  slurp:
+    path: "{{ docker_daemon_json }}"
+  register: current_daemon_json
   when: daemon_json_stat.stat.exists
+
+- name: Read new daemon.json
+  slurp:
+    path: "{{ docker_daemon_json_temp }}"
+  register: new_daemon_json
 
 - name: Set fact for configuration changed
   set_fact:
-    config_changed: "{{ daemon_json_diff.changed | default(true) }}"
+    config_changed: "{{ (current_daemon_json.content | b64decode) != (new_daemon_json.content | b64decode) }}"
   when: daemon_json_stat.stat.exists
 
 - name: Set fact for configuration not existing
@@ -45,16 +50,16 @@
 - block:
     - name: Backup existing daemon.json
       copy:
-        src: /etc/docker/daemon.json
-        dest: /etc/docker/daemon.json.bak
+        src: "{{ docker_daemon_json }}"
+        dest: "{{ docker_daemon_json_backup }}"
         remote_src: yes
       when: daemon_json_stat.stat.exists
       ignore_errors: yes
 
     - name: Apply new daemon.json
       copy:
-        src: /etc/docker/daemon.json.temp
-        dest: /etc/docker/daemon.json
+        src: "{{ docker_daemon_json_temp }}"
+        dest: "{{ docker_daemon_json }}"
 
     - name: Restart Docker
       service:
@@ -65,6 +70,6 @@
 
 - name: Remove temporary daemon.json file
   file:
-    path: /etc/docker/daemon.json.temp
+    path: "{{ docker_daemon_json_temp }}"
     state: absent
   when: docker_check.rc == 0

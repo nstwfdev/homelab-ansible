@@ -1,0 +1,5 @@
+---
+docker_config_dir: /etc/docker
+docker_daemon_json: "{{ docker_config_dir }}/daemon.json"
+docker_daemon_json_temp: "{{ docker_daemon_json }}.temp"
+docker_daemon_json_backup: "{{ docker_daemon_json }}.bak"
