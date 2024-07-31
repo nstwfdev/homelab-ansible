@@ -61,5 +61,10 @@
         name: docker
         state: restarted
       when: restart_docker | default(false)
-
   when: config_changed | bool
+
+- name: Remove temporary daemon.json file
+  file:
+    path: /etc/docker/daemon.json.temp
+    state: absent
+  when: docker_check.rc == 0
