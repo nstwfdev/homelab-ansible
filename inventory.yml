@@ -1,0 +1,29 @@
+all:
+  hosts:
+    gateway:
+      ansible_host: 192.168.1.102
+      hostname: gateway
+
+    pi-hole:
+      ansible_host: 192.168.1.103
+      hostname: pi-hole
+      restart_docker: true
+
+    vaultwarden:
+      ansible_host: 192.168.1.104
+      hostname: vaultwarden
+      restart_docker: true
+
+    homepage:
+      ansible_host: 192.168.1.106
+      hostname: homepage
+      restart_docker: true
+
+    docker-stats:
+      ansible_host: 192.168.1.107
+      hostname: docker-stats
+      restart_docker: true
+
+    semaphore:
+      ansible_host: 192.168.1.58
+      hostname: semaphore

@@ -2,6 +2,7 @@
 - name: HomeLab VM
   hosts: all
   roles:
-    - role: common
+    - role: hostname
+    - role: packages
     - role: docker
     - role: omz

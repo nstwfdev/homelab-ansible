@@ -1,0 +1,6 @@
+---
+- name: Change hostname if it is specified in inventory
+  become: yes
+  hostname:
+    name: "{{ hostvars[inventory_hostname].hostname }}"
+  when: hostvars[inventory_hostname].hostname is defined
