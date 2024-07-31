@@ -31,6 +31,7 @@
       - cfdisk
       - e2fsprogs-extra
       - fzf
+      - diff
       - ripgrep # https://github.com/BurntSushi/ripgrep
       - procs # https://github.com/dalance/procs
       - dust # https://github.com/bootandy/dust

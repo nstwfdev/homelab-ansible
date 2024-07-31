@@ -9,40 +9,57 @@
     msg: "Docker is not installed on this host."
   when: docker_check.rc != 0
 
+- name: Create Docker configuration directory
+  file:
+    path: /etc/docker
+    state: directory
+    mode: '0755'
+  when: docker_check.rc == 0
+
+- name: Check if daemon.json exists
+  stat:
+    path: /etc/docker/daemon.json
+  register: daemon_json_stat
+
+- name: Generate new daemon.json to temporary location
+  template:
+    src: daemon.json.j2
+    dest: /tmp/daemon.json
+
+- name: Compare current and new daemon.json
+  command: diff /etc/docker/daemon.json /tmp/daemon.json
+  register: daemon_json_diff
+  ignore_errors: yes
+  when: daemon_json_stat.stat.exists
+
+- name: Set fact for configuration changed
+  set_fact:
+    config_changed: "{{ daemon_json_diff.changed | default(true) }}"
+  when: daemon_json_stat.stat.exists
+
+- name: Set fact for configuration not existing
+  set_fact:
+    config_changed: true
+  when: not daemon_json_stat.stat.exists
+
 - block:
-    - name: Create Docker configuration directory
-      file:
-        path: /etc/docker
-        state: directory
-        mode: '0755'
-
-    - name: Backup existing daemon.json if it exists
-      stat:
-        path: /etc/docker/daemon.json
-      register: ansible_stat
-
-    - name: Backup existing daemon.json if it exists
+    - name: Backup existing daemon.json
       copy:
         src: /etc/docker/daemon.json
         dest: /etc/docker/daemon.json.bak
         remote_src: yes
-      when: ansible_stat.stat.exists
+      when: daemon_json_stat.stat.exists
       ignore_errors: yes
 
-    - name: Create/Update Docker daemon.json for TCP
-      template:
-        src: daemon.json.j2
+    - name: Apply new daemon.json
+      copy:
+        src: /tmp/daemon.json
         dest: /etc/docker/daemon.json
 
-    - name: Start and enable Docker service
-      service:
-        name: docker
-        state: started
-        enabled: yes
-
-    - name: Restart Docker if required
+    - name: Restart Docker
       service:
         name: docker
         state: restarted
       when: restart_docker | default(false)
-  when: docker_check.rc == 0
+
+  when: config_changed | bool
