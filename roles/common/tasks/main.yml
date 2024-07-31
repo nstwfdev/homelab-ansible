@@ -28,6 +28,8 @@
       - git
       - curl
       - unzip
+      - cfdisk
+      - e2fsprogs-extra
       - ripgrep # https://github.com/BurntSushi/ripgrep
       - procs # https://github.com/dalance/procs
       - dust # https://github.com/bootandy/dust
