@@ -53,7 +53,7 @@
 
     - name: Apply new daemon.json
       copy:
-        src: /tmp/daemon.json
+        src: /etc/docker/daemon.json.temp
         dest: /etc/docker/daemon.json
 
     - name: Restart Docker
