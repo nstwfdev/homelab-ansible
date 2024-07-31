@@ -24,10 +24,10 @@
 - name: Generate new daemon.json to temporary location
   template:
     src: daemon.json.j2
-    dest: /tmp/daemon.json
+    dest: /etc/docker/daemon.json.temp
 
 - name: Compare current and new daemon.json
-  command: diff /etc/docker/daemon.json /tmp/daemon.json
+  command: diff /etc/docker/daemon.json /etc/docker/daemon.json.temp
   register: daemon_json_diff
   ignore_errors: yes
   when: daemon_json_stat.stat.exists
