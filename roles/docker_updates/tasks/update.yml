@@ -1,15 +1,15 @@
 ---
 - name: Get list of all Docker images
-  command: > 
+  shell: >
     docker images --format "{{.Repository}}:{{.Tag}}"
   register: docker_images_list
 
 - name: Get list of all Docker containers
-  command: >
+  shell: >
     docker ps -a --format "{{.ID}}: {{.Image}}"
   register: docker_containers_list
 
-- name: Get list of all Docker images currently in use
+- name: Get list of Docker images currently in use
   set_fact:
     current_images: "{{ docker_containers_list.stdout_lines | map('split', ':') | map('last') | list }}"
 

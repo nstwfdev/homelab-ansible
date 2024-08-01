@@ -1,0 +1,5 @@
+---
+- name: Update docker containers
+  hosts: all
+  roles:
+    - role: docker_updates

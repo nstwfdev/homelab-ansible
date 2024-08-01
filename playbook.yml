@@ -6,4 +6,3 @@
     - role: packages
     - role: docker
     - role: omz
-    - role: docker_updates
