@@ -27,3 +27,11 @@ all:
     semaphore:
       ansible_host: 192.168.1.58
       hostname: semaphore
+
+    alpine:
+      ansible_host: 192.168.1.146
+      hostname: alpine
+
+    alpine-docker:
+      ansible_host: 192.168.1.36
+      hostname: alpine
