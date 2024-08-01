@@ -1,36 +1,9 @@
 ---
-- name: Check and update all Docker containers
-  hosts: all
-  tasks:
-    - name: Get list of all Docker images
-      command: docker images --format "{{.Repository}}:{{.Tag}}"
-      register: docker_images_list
+- name: Check if Docker is installed
+  command: docker --version
+  register: docker_check
+  ignore_errors: yes
 
-    - name: Get list of all Docker containers
-      command: >
-        docker ps -a --format "{{.ID}}: {{.Image}}"
-      register: docker_containers_list
-
-    - name: Get list of all Docker images currently in use
-      set_fact:
-        current_images: "{{ docker_containers_list.stdout_lines | map('split', ':') | map('last') | list }}"
-
-    - name: Check for updates to Docker images
-      docker_image:
-        name: "{{ item }}"
-        source: pull
-      loop: "{{ docker_images_list.stdout_lines }}"
-      register: image_update_result
-
-    - name: Determine which containers need to be updated
-      set_fact:
-        containers_to_update: >
-          {{
-            docker_containers_list.stdout_lines
-            | selectattr('split(":")[1]', 'in', docker_images_list.stdout_lines)
-            | list
-          }}
-
-    - name: Display list of containers that need updating
-      debug:
-        msg: "Containers that need updating: {{ containers_to_update }}"
+- name: Update docker containers
+  include_tasks: update.yml
+  when: "{{ docker_check.rc == 0 }}"
