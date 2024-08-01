@@ -37,12 +37,12 @@
     config_changed: "{{ (current_daemon_json.content | b64decode) != (new_daemon_json.content | b64decode) }}"
   when: daemon_json_stat.stat.exists
 
-- block:
-    - name: Set fact for configuration not existing
-      set_fact:
-        config_changed: true
-      when: not daemon_json_stat.stat.exists
+- name: Set fact for configuration not existing
+  set_fact:
+    config_changed: true
+  when: not daemon_json_stat.stat.exists
 
+- block:
     - name: Backup existing daemon.json
       copy:
         src: "{{ docker_daemon_json }}"
