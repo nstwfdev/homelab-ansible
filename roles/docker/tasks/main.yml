@@ -4,10 +4,6 @@
   register: docker_check
   ignore_errors: yes
 
-- name: Set fact if Docker is installed
-  set_fact:
-    is_docker_installed: "{{ docker_check.rc == 0 }}"
-
 - name: Include docker configuration tasks
   include_tasks: configuration.yml
-  when: is_docker_installed
+  when: "{{ docker_check.rc == 0 }}"

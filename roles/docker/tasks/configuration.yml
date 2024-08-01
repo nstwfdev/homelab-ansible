@@ -5,12 +5,6 @@
     state: directory
     mode: '0755'
 
-- name: Remove temporary daemon.json file
-  file:
-    path: "{{ docker_daemon_json_temp }}"
-    state: absent
-  ignore_errors: yes
-
 - name: Check if daemon.json exists
   stat:
     path: "{{ docker_daemon_json }}"
@@ -61,7 +55,6 @@
         name: docker
         state: restarted
       when: restart_docker | default(false)
-
   when: config_changed | bool
 
 - name: Remove temporary daemon.json file
