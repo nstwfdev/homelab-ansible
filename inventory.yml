@@ -35,3 +35,4 @@ all:
     alpine-docker:
       ansible_host: 192.168.1.36
       hostname: alpine
+      restart_docker: true
