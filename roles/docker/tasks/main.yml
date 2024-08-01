@@ -4,67 +4,10 @@
   register: docker_check
   ignore_errors: yes
 
-- name: Create Docker configuration directory
-  file:
-    path: "{{ docker_config_dir }}"
-    state: directory
-    mode: '0755'
-  when: docker_check.rc == 0
-
-- name: Check if daemon.json exists
-  stat:
-    path: "{{ docker_daemon_json }}"
-  register: daemon_json_stat
-
-- name: Generate new daemon.json to temporary location
-  template:
-    src: daemon.json.j2
-    dest: "{{ docker_daemon_json_temp }}"
-
-- name: Read current daemon.json
-  slurp:
-    path: "{{ docker_daemon_json }}"
-  register: current_daemon_json
-  when: daemon_json_stat.stat.exists
-
-- name: Read new daemon.json
-  slurp:
-    path: "{{ docker_daemon_json_temp }}"
-  register: new_daemon_json
-
-- name: Set fact for configuration changed
+- name: Set fact if Docker is installed
   set_fact:
-    config_changed: "{{ (current_daemon_json.content | b64decode) != (new_daemon_json.content | b64decode) }}"
-  when: daemon_json_stat.stat.exists
+    is_docker_installed: "{{ docker_check.rc == 0 }}"
 
-- name: Set fact for configuration not existing
-  set_fact:
-    config_changed: true
-  when: not daemon_json_stat.stat.exists
-
-- block:
-    - name: Backup existing daemon.json
-      copy:
-        src: "{{ docker_daemon_json }}"
-        dest: "{{ docker_daemon_json_backup }}"
-        remote_src: yes
-      when: daemon_json_stat.stat.exists
-      ignore_errors: yes
-
-    - name: Apply new daemon.json
-      copy:
-        src: "{{ docker_daemon_json_temp }}"
-        dest: "{{ docker_daemon_json }}"
-
-    - name: Restart Docker
-      service:
-        name: docker
-        state: restarted
-      when: restart_docker | default(false)
-  when: config_changed | bool
-
-- name: Remove temporary daemon.json file
-  file:
-    path: "{{ docker_daemon_json_temp }}"
-    state: absent
-  when: docker_check.rc == 0
+- name: Include daemon.json tasks
+  include_tasks: configuration.yml
+  when: is_docker_installed
