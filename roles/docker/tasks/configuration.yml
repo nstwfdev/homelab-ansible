@@ -51,7 +51,7 @@
 
     - name: Debug Docker check result
       debug:
-        var: "{{ {{ docker_daemon_json }} }}"
+        var: "{{ docker_daemon_json }}"
 
     - name: Apply new daemon.json
       copy:
