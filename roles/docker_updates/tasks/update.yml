@@ -1,6 +1,7 @@
 ---
 - name: Get list of all Docker images
-  command: docker images --format "{{.Repository}}:{{.Tag}}"
+  command: > 
+    docker images --format "{{.Repository}}:{{.Tag}}"
   register: docker_images_list
 
 - name: Get list of all Docker containers
