@@ -45,18 +45,11 @@
       when: daemon_json_stat.stat.exists
       ignore_errors: yes
 
-    - name: Debug Docker check result
-      debug:
-        var: "docker_daemon_json_temp"
-
-    - name: Debug Docker check result
-      debug:
-        var: "docker_daemon_json"
-
     - name: Apply new daemon.json
       copy:
         src: "{{ docker_daemon_json_temp }}"
         dest: "{{ docker_daemon_json }}"
+        remote_src: yes
 
     - name: Restart Docker
       service:
