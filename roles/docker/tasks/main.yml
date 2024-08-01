@@ -4,11 +4,6 @@
   register: docker_check
   ignore_errors: yes
 
-- name: Ensure Docker is installed
-  fail:
-    msg: "Docker is not installed on this host."
-  when: docker_check.rc != 0
-
 - name: Create Docker configuration directory
   file:
     path: "{{ docker_config_dir }}"
