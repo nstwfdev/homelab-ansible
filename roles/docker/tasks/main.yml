@@ -8,6 +8,6 @@
   set_fact:
     is_docker_installed: "{{ docker_check.rc == 0 }}"
 
-- name: Include daemon.json tasks
+- name: Include docker configuration tasks
   include_tasks: configuration.yml
   when: is_docker_installed

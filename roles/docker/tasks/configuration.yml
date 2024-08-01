@@ -5,6 +5,12 @@
     state: directory
     mode: '0755'
 
+- name: Remove temporary daemon.json file
+  file:
+    path: "{{ docker_daemon_json_temp }}"
+    state: absent
+  ignore_errors: yes
+
 - name: Check if daemon.json exists
   stat:
     path: "{{ docker_daemon_json }}"
