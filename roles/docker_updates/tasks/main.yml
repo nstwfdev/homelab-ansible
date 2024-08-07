@@ -4,6 +4,23 @@
   register: docker_check
   ignore_errors: yes
 
-- name: Update docker containers
-  include_tasks: update.yml
-  when: "{{ docker_check.rc == 0 }}"
+- name: Fail task if Docker is not installed
+  fail:
+    msg: "Docker is not installed, breaking task..."
+  when: docker_check.rc != 0
+
+- name: Get container info
+  community.docker.docker_host_info:
+    images: yes
+    containers: yes
+  register: host_info
+
+- name: Set containers fact
+  set_fact:
+    containers: "{{ host_info.containers }}"
+
+- name: Inspect and update containers
+  include_tasks: inspect_update_container.yml
+  loop: "{{ containers }}"
+  loop_control:
+    loop_var: container

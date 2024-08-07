@@ -1,0 +1,94 @@
+---
+- name: Inspect container
+  community.docker.docker_container_info:
+    name: "{{ container.Names[0] }}"
+  register: container_inspect
+
+- name: Extract image value
+  set_fact:
+    image_name: "{{ container_inspect.container.Config.Image }}"
+    image_revision: "{{ container_inspect.container.Image }}"
+    image_tag: "{{ container_inspect.container.Config.Image.split(':')[1] | default('latest') }}"
+    image_repo: "{{ container_inspect.container.Config.Image.split(':')[0] }}"
+
+- debug:
+    msg: "Current image: {{ image_name }}, Revision: {{ image_revision }}"
+
+- name: Extract registry and repository
+  set_fact:
+    registry: >
+      {{ 'registry-1.docker.io' if image_repo.split('/')[0] not in ['localhost', 'docker.io', 'gcr.io', 'quay.io'] else image_repo.split('/')[0] }}
+    repository: >
+      {{ image_repo if image_repo.split('/')[0] not in ['localhost', 'docker.io', 'gcr.io', 'quay.io']
+         else image_repo.split('/', 1)[1] if '/' in image_repo else image_repo }}
+
+- name: Remove leading and trailing whitespace from registry and repository
+  set_fact:
+    registry: "{{ registry | trim }}"
+    repository: "{{ repository | trim }}"
+
+- name: Print registry and repository
+  debug:
+    msg: "Registry: {{ registry }}, Repository: {{ repository }}"
+
+- name: Define default variables
+  set_fact:
+    image_updated: false
+
+- block:
+    - name: Get auth token from Docker Hub
+      uri:
+        url: "https://auth.docker.io/token?service=registry.docker.io&scope=repository:{{ repository }}:pull"
+        method: GET
+      register: auth_response
+      failed_when: auth_response.status != 200
+
+    - name: Get latest image manifest from Docker Hub
+      uri:
+        url: "https://registry-1.docker.io/v2/{{ repository }}/manifests/{{ image_tag }}"
+        method: GET
+        headers:
+          Authorization: "Bearer {{ auth_response.json.token }}"
+          Accept: "application/vnd.docker.distribution.manifest.v2+json"
+      register: latest_image_response
+
+    - name: Print response
+      debug:
+        msg: "{{ latest_image_response }}"
+
+    - name: Set latest image digest fact
+      set_fact:
+        latest_image_digest: "{{ latest_image_response.json.config.digest }}"
+
+    - debug:
+        msg: "Latest image digest: {{ latest_image_digest }}"
+
+    - name: Check if image was updated
+      set_fact:
+        image_updated: "{{ image_revision != latest_image_digest }}"
+  when: registry == 'registry-1.docker.io'
+
+- name: Update container if image updated
+  block:
+    - name: Stop the running container
+      community.docker.docker_container:
+        name: "{{ container.Names[0] }}"
+        state: stopped
+
+    - name: Remove the stopped container
+      community.docker.docker_container:
+        name: "{{ container.Names[0] }}"
+        state: absent
+
+    - name: Start a new container with the latest image
+      community.docker.docker_container:
+        name: "{{ container.Names[0] }}"
+        image: "{{ image_repo }}:{{ image_tag }}"
+        state: started
+        restart_policy: always
+  when: image_updated
+
+- name: Display message if no update was made
+  debug:
+    msg: "No updates were made to the container {{ container.Names[0] }} since the image is already up-to-date."
+  when: not image_updated
